@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TrashMap</string>
     <string name="title_activity_maps">Map</string>
+    <string name="default_info_title">Le lieu n\'a pas été sélectionné</string>
+    <string name="default_info_snippet">Le lieu n\'a pas été sélectionné</string>
+    <string name="pick_place">Choisissez un lieu</string>
 </resources>
