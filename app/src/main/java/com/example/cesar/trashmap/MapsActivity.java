@@ -281,6 +281,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.e("TAG", "GPS is on");
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(location.getLatitude(),
+                                            location.getLongitude()), DEFAULT_ZOOM));
                 Toast.makeText(MapsActivity.this, "latitude:" + latitude + " longitude:" + longitude, Toast.LENGTH_SHORT).show();
                 searchNearestPlace(voice2text);
             }
