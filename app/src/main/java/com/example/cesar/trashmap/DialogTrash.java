@@ -11,6 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
@@ -18,10 +24,12 @@ import com.google.android.gms.maps.model.Marker;
 public class DialogTrash extends DialogFragment {
     private Marker marker;
     private Spinner spinner;
+    private DatabaseReference mDatabase;
 
     @SuppressLint("ValidFragment")
     public DialogTrash(Marker marker) {
         this.marker = marker;
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
