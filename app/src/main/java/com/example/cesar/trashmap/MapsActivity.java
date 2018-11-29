@@ -1,8 +1,14 @@
 package com.example.cesar.trashmap;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -31,7 +38,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleMap.OnMapClickListener {
+        GoogleMap.OnMapClickListener,
+        LocationListener {
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -55,6 +63,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String[] mLikelyPlaceAddresses;
     private String[] mLikelyPlaceAttributions;
     private LatLng[] mLikelyPlaceLatLngs;
+
+    Intent intentThatCalled;
+    public double latitude;
+    public double longitude;
+    public LocationManager locationManager;
+    public Criteria criteria;
+    public String bestProvider;
+    String voice2text; //added
 
 
     @Override
@@ -148,8 +164,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
+        intentThatCalled = getIntent();
+        voice2text = intentThatCalled.getStringExtra("v2txt");
         // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+        getLocation();
     }
 
     private void getLocationPermission() {
@@ -200,42 +218,122 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
-    private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
-        try {
-            if (mLocationPermissionGranted) {
-                Task locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = (Location) task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+//    private void getDeviceLocation() {
+//        /*
+//         * Get the best and most recent location of the device, which may be null in rare
+//         * cases when a location is not available.
+//         */
+//        try {
+//            if (mLocationPermissionGranted) {
+//                Task locationResult = mFusedLocationProviderClient.getLastLocation();
+//                locationResult.addOnCompleteListener(this, new OnCompleteListener() {
+//                    @Override
+//                    public void onComplete(@NonNull Task task) {
+//                        if (task.isSuccessful()) {
+//                            // Set the map's camera position to the current location of the device.
+//                            mLastKnownLocation = (Location) task.getResult();
+//                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//                                    new LatLng(mLastKnownLocation.getLatitude(),
+//                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+//                        } else {
+//                            Log.d(TAG, "Current location is null. Using defaults.");
+//                            Log.e(TAG, "Exception: %s", task.getException());
+//                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+//                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+//                        }
+//                    }
+//                });
+//            }
+//        } catch(SecurityException e)  {
+//            Log.e("Exception: %s", e.getMessage());
+//        }
+//    }
 
-                            addMarkerUser(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                        } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        }
-                    }
-                });
+    public static boolean isLocationEnabled(Context context) {
+        //...............
+        return true;
+    }
+
+    protected void getLocation() {
+        if (isLocationEnabled(MapsActivity.this)) {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            criteria = new Criteria();
+            bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true)).toString();
+
+            //You can still do this if you like, you might get lucky:
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
             }
-        } catch(SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
+            Location location = locationManager.getLastKnownLocation(bestProvider);
+            if (location != null) {
+                Log.e("TAG", "GPS is on");
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Toast.makeText(MapsActivity.this, "latitude:" + latitude + " longitude:" + longitude, Toast.LENGTH_SHORT).show();
+                searchNearestPlace(voice2text);
+            }
+            else{
+                //This is what you need:
+                locationManager.requestLocationUpdates(bestProvider, 1000, 0, this);
+            }
         }
+        else
+        {
+            //prompt user to enable location....
+            //.................
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(this);
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        //Hey, a non null location! Sweet!
+
+        //remove location callback:
+        locationManager.removeUpdates(this);
+
+        //open the map:
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        Toast.makeText(MapsActivity.this, "latitude:" + latitude + " longitude:" + longitude, Toast.LENGTH_SHORT).show();
+        searchNearestPlace(voice2text);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public void searchNearestPlace(String v2txt) {
+        //.....
     }
 
     private void showCurrentPlace() {
@@ -347,13 +445,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {
         addMarkerInterest(latLng);
-    }
-
-    public void addMarkerUser(double lat, double lng) {
-        // Add a marker in Sydney and move the camera
-        LatLng user = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(user).title("Vous êtes ici"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(user));
     }
 
     public void addMarkerInterest(LatLng latLng) {

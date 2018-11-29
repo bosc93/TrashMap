@@ -6,7 +6,7 @@
     <string name="pick_place">Choisissez un lieu</string>
     <string name="difficulty_name">Difficulté</string>
     <string-array name="difficulty">
-        <item>Faible</item>
+        <item>Facile</item>
         <item>Moyen</item>
         <item>Difficile</item>
     </string-array>
