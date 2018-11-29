@@ -17,7 +17,8 @@ import com.google.android.gms.maps.model.Marker;
 @SuppressLint("ValidFragment")
 public class DialogTrash extends DialogFragment {
     private Marker marker;
-    private Spinner spinner;
+    private String spinnerStr;
+    private ViewGroup container;
 
     @SuppressLint("ValidFragment")
     public DialogTrash(Marker marker) {
@@ -25,19 +26,10 @@ public class DialogTrash extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // R.layout.my_layout - that's the layout where your textview is placed
-        View view = inflater.inflate(R.layout.custom_info_contents, container, false);
-        Spinner spinner = (Spinner) view.findViewById(R.id.difficulty);
-        this.spinner = spinner;
-        return view;
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -47,11 +39,15 @@ public class DialogTrash extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         //Ajouter LatLng, nom du point, matériau et difficulté en base
-                        if (spinner.getSelectedItem().toString() == "Facile") {
+                        View view = inflater.inflate(R.layout.custom_info_contents, container, false);
+                        Spinner spinner = (Spinner) view.findViewById(R.id.difficulty);
+                        spinnerStr = spinner.getSelectedItem().toString();
+
+                        if (spinnerStr.equals("Facile")) {
                             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                        }else if (spinner.getSelectedItem().toString() == "Moyen") {
+                        }else if (spinnerStr.equals("Moyen")) {
                             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                        }else if (spinner.getSelectedItem().toString() == "Difficile") {
+                        }else if (spinnerStr.equals("Difficile")) {
                             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                         }
                     }
