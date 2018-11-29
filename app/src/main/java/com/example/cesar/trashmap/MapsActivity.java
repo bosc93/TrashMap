@@ -7,13 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -31,7 +30,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -100,6 +100,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setOnMapClickListener(this);
+
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -113,16 +120,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public View getInfoContents(Marker marker) {
                 // Inflate the layouts for the info window, title and snippet.
-                View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
-                        (FrameLayout) findViewById(R.id.map), false);
+//                View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_user,
+//                        (FrameLayout) findViewById(R.id.map), false);
+//                // Create an ArrayAdapter using the string array and a default spinner layout
+////                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(MapsActivity.this,
+////                        R.array.difficulty, R.layout.custom_info_contents);
+//
+//                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
+//                title.setText(marker.getTitle());
 
-                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
-                title.setText(marker.getTitle());
+//                EditText nameTrash = ((EditText) infoWindow.findViewById(R.id.nameTrash));
+//                nameTrash.setText(marker.getSnippet());
 
-                TextView snippet = ((TextView) infoWindow.findViewById(R.id.snippet));
-                snippet.setText(marker.getSnippet());
+//                Spinner spinner = (Spinner) findViewById(R.id.difficulty);
+//                // Specify the layout to use when the list of choices appears
+//                adapter.setDropDownViewResource(R.layout.custom_info_contents);
+//                // Apply the adapter to the spinner
+//                spinner.setAdapter(adapter);
 
-                return infoWindow;
+                return null;
             }
         });
 
@@ -134,11 +150,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
-
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void getLocationPermission() {
@@ -333,17 +344,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .show();
     }
 
+    @Override
+    public void onMapClick(LatLng latLng) {
+        addMarkerInterest(latLng);
+    }
+
     public void addMarkerUser(double lat, double lng) {
         // Add a marker in Sydney and move the camera
         LatLng user = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(user).title("Vous êtes ici").snippet("Adresse"));
+        mMap.addMarker(new MarkerOptions().position(user).title("Vous êtes ici"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(user));
     }
 
-    public void addMarkerInterest(double lat, double lng) {
+    public void addMarkerInterest(LatLng latLng) {
         // Add a marker in Sydney and move the camera
-        LatLng interest = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(interest).title("Point de déchet"));
+        LatLng interest = new LatLng(latLng.latitude, latLng.longitude);
+        Marker marker = mMap.addMarker(new MarkerOptions().position(interest).title("Point de déchet"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(interest));
+
+        FragmentManager fm = getSupportFragmentManager();
+        DialogTrash editNameDialogFragment = new DialogTrash(marker);
+        editNameDialogFragment.show(fm, "fragment_edit_name");
     }
 }

@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">TrashMap</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">TrashMap</string>
     <string name="default_info_title">Le lieu n\'a pas été sélectionné</string>
     <string name="default_info_snippet">Le lieu n\'a pas été sélectionné</string>
     <string name="pick_place">Choisissez un lieu</string>
+    <string name="difficulty_name">Difficulté</string>
+    <string-array name="difficulty">
+        <item>Faible</item>
+        <item>Moyen</item>
+        <item>Difficile</item>
+    </string-array>
 </resources>
