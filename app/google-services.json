@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "327868980739",
+    "firebase_url": "https://trashmap-ae78f.firebaseio.com",
+    "project_id": "trashmap-ae78f",
+    "storage_bucket": "trashmap-ae78f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327868980739:android:5520628993e63fef",
+        "android_client_info": {
+          "package_name": "com.example.cesar.trashmap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "327868980739-80k5bnqej1erm7jv5o2unk7350kva6vs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVZBIP-uKP7L6tcrfpkw52J6qz3Cb0OcQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
